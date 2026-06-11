@@ -1,0 +1,16 @@
+{
+  "device_name_filter": "Zwift Click",
+  "bindings": {
+    "up": "up",
+    "down": "down",
+    "left": "left",
+    "right": "right",
+    "a": "x",
+    "b": "z",
+    "y": "v",
+    "z": "c",
+    "plus": "q",
+    "minus": "w"
+  },
+  "debounce_ms": 30
+}
