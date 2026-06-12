@@ -1,4 +1,4 @@
-# Zwift Click v2 → Keyboard Mapper (Windows)
+# Zwift Click v2 → Keyboard Mapper (Windows + macOS)
 
 Use your **Zwift Click v2** as a keyboard on Windows — bind any Click button to any key. Works with Zwift, MyWhoosh, indieVelo, emulators, or any app that takes keyboard input. Yes, you can play Pokémon on your trainer.
 
@@ -15,7 +15,7 @@ No companion app needed — connects directly to the Click over Bluetooth LE.
 
 ## Requirements
 
-- Windows 10/11 with Bluetooth LE
+- Windows 10/11 or macOS, with Bluetooth LE
 - Python 3.10+ (tick **"Add Python to PATH"** during install!)
 - A Zwift Click v2
 
@@ -24,7 +24,8 @@ No companion app needed — connects directly to the Click over Bluetooth LE.
 1. Install Python from https://www.python.org/downloads/
 2. Open Command Prompt and run:
    ```
-   pip install bleak pydirectinput
+   pip install bleak pydirectinput      (Windows)
+   pip3 install bleak pynput            (macOS)
    ```
 3. Download this repo (green **Code** button → Download ZIP) and extract it anywhere.
 
@@ -63,6 +64,19 @@ Left side = Click button, right side = keyboard key to send. Key names: letters,
 - **Terminal shows presses but the app ignores them** — run as administrator; click the app window so it has focus; check the app's own key bindings match your config
 - **`unbound button: btnX_Y`** — that button isn't in your config yet; add it using that exact name
 - **LED flashing orange** — flat CR2032 battery
+
+## macOS
+
+Same script works on Mac:
+
+1. Install Python 3 (from python.org or `brew install python`)
+2. In Terminal: `pip3 install bleak pynput`
+3. Run: `python3 zwift_click_mapper.py`
+4. **Grant permissions** when macOS asks (or pre-emptively in System Settings → Privacy & Security):
+   - **Bluetooth** for Terminal/Python
+   - **Accessibility** for Terminal/Python (required for key injection — without this, keys silently do nothing)
+
+Key names in config.json are the same. No admin/sudo needed.
 
 ## Credits & disclaimer
 
