@@ -13,14 +13,57 @@ import sys
 import time
 from pathlib import Path
 
+import platform
+
 try:
-    import pydirectinput  # scan-code key injection (works in games/emulators)
     from bleak import BleakClient, BleakScanner
 except ImportError:
-    print("Missing libraries. Run:  pip install bleak pydirectinput")
+    print("Missing library. Run:  pip install bleak")
     sys.exit(1)
 
-pydirectinput.PAUSE = 0  # remove built-in delay for low latency
+# --- key injection backend: pydirectinput on Windows, pynput elsewhere ---
+IS_WINDOWS = platform.system() == "Windows"
+
+if IS_WINDOWS:
+    try:
+        import pydirectinput
+    except ImportError:
+        print("Missing library. Run:  pip install pydirectinput")
+        sys.exit(1)
+    pydirectinput.PAUSE = 0  # remove built-in delay for low latency
+
+    def key_down_raw(key):
+        pydirectinput.keyDown(key)
+
+    def key_up_raw(key):
+        pydirectinput.keyUp(key)
+else:
+    try:
+        from pynput.keyboard import Controller, Key
+    except ImportError:
+        print("Missing library. Run:  pip install pynput")
+        sys.exit(1)
+    _kb = Controller()
+
+    def _to_key(name):
+        name = name.lower()
+        if len(name) == 1:
+            return name
+        try:
+            return Key[name.replace(" ", "_")]
+        except KeyError:
+            print(f"Unknown key name in config: '{name}'")
+            return None
+
+    def key_down_raw(key):
+        k = _to_key(key)
+        if k is not None:
+            _kb.press(k)
+
+    def key_up_raw(key):
+        k = _to_key(key)
+        if k is not None:
+            _kb.release(k)
 
 # ---------------------------------------------------------------- config ---
 CONFIG_PATH = Path(__file__).parent / "config.json"
@@ -113,14 +156,14 @@ class ClickMapper:
         if now - self.last_press.get(button, 0) < self.debounce:
             return
         self.last_press[button] = now
-        pydirectinput.keyDown(key)
+        key_down_raw(key)
         print(f"  {button:<6} -> {key} DOWN")
 
     def key_up(self, button):
         key = self.bindings.get(button)
         if not key:
             return
-        pydirectinput.keyUp(key)
+        key_up_raw(key)
         print(f"  {button:<6} -> {key} UP")
 
     def handle(self, _sender, data: bytearray):
